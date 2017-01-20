@@ -1,0 +1,27 @@
+{
+    "name": "buildok/validator",
+    "type": "package",
+    "homepage": "https://github.com/buildok/validator",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "buildok",
+            "email": "buildok@mail.ru",
+            "homepage": "https://github.com/buildok",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "buildok/helpers": "~1"
+    },
+    "autoload": {
+    	"psr-4": {
+    		"buildok\\validator\\": "src"
+    	}
+    },
+    "autoload-dev": {
+    	"psr-4": {
+    		"buildok\\validator\\test\\": "tests"
+    	}
+    }
+}

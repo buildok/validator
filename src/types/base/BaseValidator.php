@@ -20,14 +20,39 @@ abstract class BaseValidator
 	 */
 	protected $value;
 
-	public function __construct($value, ArrayWrapper $rules)
+	/**
+	 * Validation errors
+	 * @var array
+	 */
+	private $errors;
+
+	public function __construct($rules, $value = null)
 	{
 		$this->value = $value;
-		$this->rules = $rules;
+		$this->rules = new ArrayWrapper($rules);
+		$this->errors = [];
 	}
 
 	/**
-	 * [validate description]
+	 * Returns validation errors
+	 * @return array
+	 */
+	public function getErrors()
+	{
+		return $this->errors;
+	}
+
+	/**
+	 * Returns TRUE if it has errors else FALSE
+	 * @return boolean
+	 */
+	public function hasErrors()
+	{
+		return (bool)$this->errors;
+	}
+
+	/**
+	 * Main validation function
 	 * @return boolean
 	 */
 	abstract public function validate();

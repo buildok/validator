@@ -1,7 +1,6 @@
 <?php
 namespace buildok\validator;
 
-use buildok\helpers\ArrayWrapper;
 use buildok\exceptions\ValidatorException;
 
 /**
@@ -25,7 +24,7 @@ class Validator
             throw new ValidatorException('Unknown validator ' . $type);
         }
 
-        $validator = new $class($value, new ArrayWrapper($rules));
+        $validator = new $class($value, $rules);
 
         return $validator;
 	}

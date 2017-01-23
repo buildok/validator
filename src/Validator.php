@@ -13,7 +13,7 @@ class Validator
 	 * Validators
 	 * @var ArrayWrapper;
 	 */
-	private $tool;
+	private $validators;
 
 	/**
 	 * Object to test
@@ -28,15 +28,25 @@ class Validator
 	private $rules;
 
 	/**
+	 * Validation errors
+	 * @var ArrayWrapper
+	 */
+	private $errors;
+
+	/**
 	 * Init
 	 * @param  array 	$dataSet 	Values to test
 	 * @param  array  	$rules 		Array of validation rules
 	 */
 	public function __construct($dataSet, $rules)
 	{
-		$this->validator = new ArrayWrapper();
-		$this->dataSet = new ArrayWrapper($dataSet);
+		$this->validators = new ArrayWrapper();
+		$this->dataSet = $dataSet;
+		if(!is_array($rules)) {
+			throw new ValidatorException('Invalid declaration of validation rule');
+		}
 		$this->rules = $rules;
+		$this->errors = new ArrayWrapper();
 	}
 
 	/**
@@ -45,16 +55,23 @@ class Validator
 	 */
 	public function validate()
 	{
+		$this->errors->set();
+
 		foreach ($this->rules as $rule) {
 			list($fields, $type, $options) = $this->parseRule($rule);
 
-			if($field && $type) {
-				if(!$validator = $this->tool->$type) {
-					$validator = $this->create();
-					$this->tool->$type = $validator;
+			if($fields && $type) {
+				if(!$item = $this->validators->$type) {
+
+					$item = $this->create($type);
+					$this->validators->$type = $item;
 				}
 
-				$validator->check($this->dataSet, $fields, $options);
+				if(!$item->validate($this->dataSet, $fields, $options)) {
+					foreach ($item->getErrors as $key => $field) {
+						$this->errors->$field[] = $field;
+					}
+				}
 			}
 		}
 	}
@@ -79,9 +96,17 @@ class Validator
 	}
 
 	/**
-	 * [parseRule description]
-	 * @param  [type] $rule [description]
-	 * @return [type]       [description]
+	 * Parse validation rule
+	 *
+	 * Returns formated validation rule like as [
+	 * 		array 	-- Array of fields to validate
+	 * 		string 	-- Validator name
+	 * 		array 	-- Additional options for validator
+	 * ]
+	 * @param  array $rule Validation rule
+	 * @return array
+	 *
+	 * @throws ValidatorException
 	 */
 	protected function parseRule($rule)
 	{
@@ -92,7 +117,7 @@ class Validator
 		is_array($rule[0]) || $rule[0] = [$rule[0]];
 
 		if(!is_string($rule[1])) {
-			throw new ValidatorException('Validator name: Expected string');
+			throw new ValidatorException('Validator name: expected string');
 		}
 
 		if(isset($rule[2])) {

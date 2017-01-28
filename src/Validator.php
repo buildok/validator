@@ -59,6 +59,8 @@ class Validator
 	 */
 	public function validate()
 	{
+		$this->errors->set();
+
 		foreach ($this->rules as $rule) {
 			list($fields, $type, $options) = $this->parseRule($rule);
 
@@ -137,6 +139,8 @@ class Validator
 	 * Check rules format
 	 * @param  array $rule Array of validation rules
 	 * @return array
+	 *
+	 * @throws ValidatorException
 	 */
 	private function parseRule($rule)
 	{

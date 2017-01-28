@@ -1,24 +1,22 @@
 <?php
 namespace buildok\validator\types\base;
 
-use buildok\helpers\ArrayWrapper;
-
 /**
-*
-*/
+ *
+ */
 abstract class BaseValidator
 {
 	/**
-	 * Object of validation rules
-	 * @var ArrayWrapper
+	 * Validation options
+	 * @var buildok\helpers\ArrayWrapper
 	 */
-	protected $rules;
+	protected $options;
 
 	/**
-	 * Value to test
-	 * @var mixed
+	 * Error code
+	 * @var string
 	 */
-	protected $value;
+	protected $code;
 
 	/**
 	 * Validation errors
@@ -26,20 +24,12 @@ abstract class BaseValidator
 	 */
 	private $errors;
 
-	public function __construct($rules, $value = null)
-	{
-		$this->value = $value;
-		$this->rules = new ArrayWrapper($rules);
-		$this->errors = [];
-	}
-
 	/**
-	 * Returns validation errors
-	 * @return array
+	 * Init
 	 */
-	public function getErrors()
+	public function __construct()
 	{
-		return $this->errors;
+		$this->code = 0;
 	}
 
 	/**
@@ -52,8 +42,56 @@ abstract class BaseValidator
 	}
 
 	/**
+	 * Returns validation errors
+	 * @return array
+	 */
+	public function getErrors()
+	{
+		return $this->errors;
+	}
+
+	/**
 	 * Main validation function
+	 * @param  mixed $value Value to check
+	 * @param  buildok\helpers\ArrayWrapper $options Validation options
 	 * @return boolean
 	 */
-	abstract public function validate();
+	public function validate($value, $options)
+	{
+		$this->value = $value;
+		$this->options = $options;
+
+		if (!$ret = $this->checkIt()) {
+			$this->setError();
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Check value
+	 * @return boolean
+	 */
+	abstract protected function checkIt();
+
+	/**
+	 * Returns error messages
+	 * @return array
+	 */
+	protected function messages()
+	{
+		return [];
+	}
+
+	/**
+	 * Sets error message
+	 */
+	protected function setError()
+	{
+		if (!$msg = $this->options->message) {
+			$msg = $this->messages()[$this->code];
+		}
+
+		$this->errors[] = $msg;
+	}
 }

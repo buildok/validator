@@ -23,6 +23,10 @@ class RequiredValidator extends BaseValidator
 	 */
 	protected function checkIt()
 	{
-		return !is_null($this->value);
+		if ($ret = is_null($this->value)) {
+			$this->error(0);
+		}
+
+		return !$ret;
 	}
 }

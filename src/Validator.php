@@ -29,7 +29,7 @@ class Validator
 
 	/**
 	 * Validation errors
-	 * @var array
+	 * @var ArrayWrapper
 	 */
 	private $errors;
 
@@ -38,9 +38,9 @@ class Validator
 	 *
 	 * @example
 	 * 		$rules = [
-	 *           ['field_0', 'validator_0'],
-	 *           [['field_1', 'field_2'], 'validator_1'],
-	 *           [['field_3', 'field_4'], 'validator_2', ['option_name' => 'some_value']],
+	 *           ['field_0', 'validator'],
+	 *           [['field_1', 'field_2'], 'validator'],
+	 *           [['field_3', 'field_4'], 'validator', ['option_name' => 'some_value']],
 	 *      ];
 	 * @param  array $dataSet Values to test
 	 * @param  array $rules Array of validation rules
@@ -50,7 +50,7 @@ class Validator
 		$this->validators = new ArrayWrapper;
 		$this->dataSet = new ArrayWrapper($dataSet);
 		$this->rules = $rules;
-		$this->errors = [];
+		$this->errors = new ArrayWrapper;
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Validator
 			foreach ($fields as $field) {
 				$value = $this->dataSet->$field;
 
-				if (!$validator->validate($value, new ArrayWrapper($options))) {
+				if (!$validator->validate($value, $options)) {
 					$this->addErrors($field, $validator->getErrors());
 				}
 			}
@@ -87,7 +87,7 @@ class Validator
 	 */
 	public function hasErrors()
 	{
-		return (bool)$this->errors;
+		return (bool)$this->errors->getData();
 	}
 
 	/**
@@ -97,11 +97,7 @@ class Validator
 	 */
 	public function getErrors($field = null)
 	{
-		if ($field) {
-			return (isset($this->errors[$field]) ? $this->errors[$field] : null);
-		}
-
-		return $this->errors;
+		return (($field) ? $this->errors->$field : $this->errors->getData());
 	}
 
 	/**
@@ -111,9 +107,7 @@ class Validator
 	 */
 	private function addErrors($field, $errors)
 	{
-		$tmp = isset($this->errors[$field]) ? $this->errors[$field] : [];
-
-		$this->errors[$field] = array_merge($tmp, $errors);
+		$this->errors->$field = array_merge((array)$this->errors->$field, $errors);
 	}
 
 	/**
@@ -161,6 +155,7 @@ class Validator
 		} else {
 			$rule[2] = [];
 		}
+		$rule[2] = new ArrayWrapper($rule[2]);
 
 		return $rule;
 	}

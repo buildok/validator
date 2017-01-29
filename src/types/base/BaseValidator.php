@@ -13,24 +13,10 @@ abstract class BaseValidator
 	protected $options;
 
 	/**
-	 * Error code
-	 * @var string
-	 */
-	protected $code;
-
-	/**
-	 * Validation errors
+	 * Array of validation errors codes
 	 * @var array
 	 */
 	private $errors;
-
-	/**
-	 * Init
-	 */
-	public function __construct()
-	{
-		$this->code = 0;
-	}
 
 	/**
 	 * Returns TRUE if it has errors else FALSE
@@ -47,7 +33,17 @@ abstract class BaseValidator
 	 */
 	public function getErrors()
 	{
-		return $this->errors;
+		if ($msg = $this->options->message) {
+			$errors[] = $msg;
+		} else {
+
+			$messages = $this->messages();
+			foreach ($this->errors as $code) {
+				$errors[] = $messages[$code];
+			}
+		}
+
+		return $errors;
 	}
 
 	/**
@@ -60,12 +56,9 @@ abstract class BaseValidator
 	{
 		$this->value = $value;
 		$this->options = $options;
+		$this->errors = [];
 
-		if (!$ret = $this->checkIt()) {
-			$this->setError();
-		}
-
-		return $ret;
+		return $this->checkIt();
 	}
 
 	/**
@@ -84,14 +77,13 @@ abstract class BaseValidator
 	}
 
 	/**
-	 * Sets error message
+	 * Sets error code
+	 * @param  int $code Key of error message
 	 */
-	protected function setError()
+	protected function error($code)
 	{
-		if (!$msg = $this->options->message) {
-			$msg = $this->messages()[$this->code];
+		if (!in_array($code, $this->errors)) {
+			$this->errors[] = $code;
 		}
-
-		$this->errors[] = $msg;
 	}
 }

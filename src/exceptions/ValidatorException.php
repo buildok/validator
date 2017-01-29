@@ -1,5 +1,5 @@
 <?php
-namespace buildok\exceptions;
+namespace buildok\validator\exceptions;
 
 /**
 *

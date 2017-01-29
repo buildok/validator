@@ -15,8 +15,8 @@ class StringValidator extends BaseValidator
 	{
 		return [
 			'is should be string',
-			"is too long string (max = $this->options->max)",
-			"is too short string (min = $this->options->min)"
+			'is too long string (max = ' . $this->options->max .')',
+			'is too short string (min = ' . $this->options->min .')'
 		];
 	}
 
@@ -28,8 +28,8 @@ class StringValidator extends BaseValidator
 		if (!$ret = is_string($this->value)) {
 			$this->error(0);
 		} else {
-			!$this->options->max || $ret && $this->maxLength();
-			!$this->options->min || $ret && $this->minLength();
+			$ret = $ret && (!$this->options->max || $this->maxLength());
+			$ret = $ret && (!$this->options->min || $this->minLength());
 		}
 
 		return $ret;

@@ -1,7 +1,7 @@
 <?php
 namespace buildok\validator;
 
-use buildok\exceptions\ValidatorException;
+use buildok\validator\exceptions\ValidatorException;
 use buildok\helpers\ArrayWrapper;
 
 /**
@@ -47,6 +47,10 @@ class Validator
 	 */
 	public function __construct($dataSet, $rules)
 	{
+		if (!is_array($rules)) {
+			throw new ValidatorException('Invalid declaration of validation rule');
+		}
+
 		$this->validators = new ArrayWrapper;
 		$this->dataSet = new ArrayWrapper($dataSet);
 		$this->rules = $rules;
@@ -61,7 +65,7 @@ class Validator
 	{
 		$this->errors->set();
 
-		foreach ($this->rules as $rule) {
+		foreach ($this->rules as $key => $rule) {
 			list($fields, $type, $options) = $this->parseRule($rule);
 
 			if (!$validator = $this->validators->$type) {
@@ -69,7 +73,7 @@ class Validator
 				$this->validators->$type = $validator;
 			}
 
-			foreach ($fields as $field) {
+			foreach ($fields as $key => $field) {
 				$value = $this->dataSet->$field;
 
 				if (!$validator->validate($value, $options)) {

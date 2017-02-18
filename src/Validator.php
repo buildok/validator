@@ -58,6 +58,15 @@ class Validator
 	}
 
 	/**
+	 * Reload data set
+	 * @param  array $dataSet Values to test
+	 */
+	public function reload($dataSet = [])
+	{
+		$this->dataSet->set($dataSet);
+	}
+
+	/**
 	 * Launch validation
 	 * @return boolean
 	 */
@@ -66,7 +75,7 @@ class Validator
 		$this->errors->set();
 
 		foreach ($this->rules as $key => $rule) {
-			list($fields, $type, $options) = $this->parseRule($rule);
+			list ($fields, $type, $options) = $this->parseRule($rule);
 
 			if (!$validator = $this->validators->$type) {
 				$validator = $this->create($type);
@@ -101,7 +110,7 @@ class Validator
 	 */
 	public function getErrors($field = null)
 	{
-		return (($field) ? $this->errors->$field : $this->errors->getData());
+		return (($field) ? (array)$this->errors->$field : $this->errors->getData());
 	}
 
 	/**
